@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.learning.core.dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.learning.core.pojo.User" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="user_code" property="userCode" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="user_password" property="userPassword" jdbcType="VARCHAR" />
+    <result column="user_state" property="userState" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, user_code, username, user_password, user_state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <!--通过账号和密码查询用户-->
+  <select id="findUser" parameterType="String" resultType="user">
+    select *
+    from sys_user
+    where user_code=#{usercode}
+    and user_password=#{password}
+    and user_state='1'
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from sys_user
+    where user_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.learning.core.pojo.User" >
+    insert into sys_user (user_id, user_code, username, 
+      user_password, user_state)
+    values (#{userId,jdbcType=INTEGER}, #{userCode,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
+      #{userPassword,jdbcType=VARCHAR}, #{userState,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.learning.core.pojo.User" >
+    insert into sys_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="userCode != null" >
+        user_code,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="userPassword != null" >
+        user_password,
+      </if>
+      <if test="userState != null" >
+        user_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userCode != null" >
+        #{userCode,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userPassword != null" >
+        #{userPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null" >
+        #{userState,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.learning.core.pojo.User" >
+    update sys_user
+    <set >
+      <if test="userCode != null" >
+        user_code = #{userCode,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userPassword != null" >
+        user_password = #{userPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="userState != null" >
+        user_state = #{userState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.learning.core.pojo.User" >
+    update sys_user
+    set user_code = #{userCode,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      user_password = #{userPassword,jdbcType=VARCHAR},
+      user_state = #{userState,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+</mapper>

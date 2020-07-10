@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.learning.core.dao.CustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.learning.core.pojo.Customer" >
+    <id column="cust_id" property="custId" jdbcType="INTEGER" />
+    <result column="custname" property="custname" jdbcType="VARCHAR" />
+    <result column="cust_user_id" property="custUserId" jdbcType="INTEGER" />
+    <result column="cust_create_id" property="custCreateId" jdbcType="INTEGER" />
+    <result column="cust_source" property="custSource" jdbcType="VARCHAR" />
+    <result column="cust_industry" property="custIndustry" jdbcType="VARCHAR" />
+    <result column="cust_level" property="custLevel" jdbcType="VARCHAR" />
+    <result column="cust_linkman" property="custLinkman" jdbcType="VARCHAR" />
+    <result column="cust_phone" property="custPhone" jdbcType="VARCHAR" />
+    <result column="cust_mobile" property="custMobile" jdbcType="VARCHAR" />
+    <result column="cust_zipcode" property="custZipcode" jdbcType="VARCHAR" />
+    <result column="cust_address" property="custAddress" jdbcType="VARCHAR" />
+    <result column="cust_createtime" property="custCreatetime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    cust_id, custname, cust_user_id, cust_create_id, cust_source, cust_industry, cust_level, 
+    cust_linkman, cust_phone, cust_mobile, cust_zipcode, cust_address, cust_createtime
+  </sql>
+  
+  <sql id="selectCustomerListWhere">
+  	<where>
+  		<if test="custname!=null">
+  			custname like "%"#{custname}"%"
+  		</if>
+  		<if test="custSource!=null">
+  			and cust_source=#{custSource}
+  		</if>
+  		<if test="custIndustry!=null">
+  			and cust_industry=#{custIndustry}
+  		</if>
+  		<if test="custLevel!=null">
+  			and cust_level=#{custLevel}
+  		</if>
+  	</where>
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from customer
+    where cust_id = #{custId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 查询客户列表 -->
+  <select id="selectCustomerList" resultMap="BaseResultMap" parameterType="customer" resultType="customer">
+  	select cust_id, custname, cust_user_id, cust_create_id,
+  	b.dict_item_name cust_source,
+  	c.dict_item_name cust_industry,
+  	d.dict_item_name cust_level, 
+    cust_linkman, cust_phone, cust_mobile, cust_createtime
+    from customer a
+    left join(
+    	select dict_id,dict_item_name
+    	from base_dict
+    	where dict_type_code='002'
+    )
+    b on a.cust_source=b.dict_id
+    left join(
+    select dict_id,dict_item_name
+    from base_dict
+    where dict_type_code='001'
+    )
+    c on a.cust_industry=c.dict_id
+    left join(
+    select dict_id,dict_item_name
+    from base_dict
+    where dict_type_code='006'
+    )
+    d on a.cust_level=d.dict_id
+    <include refid="selectCustomerListWhere"></include>
+    <!-- 执行分页查询 -->
+    <if test="start!=null and rows!=null">
+    	limit #{start},#{rows}
+    </if>
+  </select>
+  
+  <!-- 查询客户总数 -->
+  <select id="selectCustomerListCount" parameterType="customer" resultType="Integer">
+  	select count(*) from customer
+  	<include refid="selectCustomerListWhere"/>
+  </select>
+  
+  <!-- 添加客户 -->
+  <insert id="createCustomer" parameterType="customer">
+  	insert into customer(
+  		custname,
+  		cust_user_id,
+  		cust_create_id,
+  		cust_source,
+  		cust_industry,
+  		cust_level, 
+    	cust_linkman,
+    	cust_phone,
+    	cust_mobile,
+    	cust_zipcode,
+    	cust_address,
+    	cust_createtime
+  	)
+  	values(
+  		#{custname},
+  		#{custUserId},
+  		#{custCreateId},
+  		#{custSource},
+  		#{custIndustry},
+  		#{custLevel},
+  		#{custLinkman},
+  		#{custPhone},
+  		#{custMobile},
+  		#{custZipcode},
+  		#{custAddress},
+  		#{custCreatetime}
+  	)
+  </insert>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from customer
+    where cust_id = #{custId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.learning.core.pojo.Customer" >
+    insert into customer (cust_id, custname, cust_user_id, 
+      cust_create_id, cust_source, cust_industry, 
+      cust_level, cust_linkman, cust_phone, 
+      cust_mobile, cust_zipcode, cust_address, 
+      cust_createtime)
+    values (#{custId,jdbcType=INTEGER}, #{custname,jdbcType=VARCHAR}, #{custUserId,jdbcType=INTEGER}, 
+      #{custCreateId,jdbcType=INTEGER}, #{custSource,jdbcType=VARCHAR}, #{custIndustry,jdbcType=VARCHAR}, 
+      #{custLevel,jdbcType=VARCHAR}, #{custLinkman,jdbcType=VARCHAR}, #{custPhone,jdbcType=VARCHAR}, 
+      #{custMobile,jdbcType=VARCHAR}, #{custZipcode,jdbcType=VARCHAR}, #{custAddress,jdbcType=VARCHAR}, 
+      #{custCreatetime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.learning.core.pojo.Customer" >
+    insert into customer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="custId != null" >
+        cust_id,
+      </if>
+      <if test="custname != null" >
+        custname,
+      </if>
+      <if test="custUserId != null" >
+        cust_user_id,
+      </if>
+      <if test="custCreateId != null" >
+        cust_create_id,
+      </if>
+      <if test="custSource != null" >
+        cust_source,
+      </if>
+      <if test="custIndustry != null" >
+        cust_industry,
+      </if>
+      <if test="custLevel != null" >
+        cust_level,
+      </if>
+      <if test="custLinkman != null" >
+        cust_linkman,
+      </if>
+      <if test="custPhone != null" >
+        cust_phone,
+      </if>
+      <if test="custMobile != null" >
+        cust_mobile,
+      </if>
+      <if test="custZipcode != null" >
+        cust_zipcode,
+      </if>
+      <if test="custAddress != null" >
+        cust_address,
+      </if>
+      <if test="custCreatetime != null" >
+        cust_createtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="custId != null" >
+        #{custId,jdbcType=INTEGER},
+      </if>
+      <if test="custname != null" >
+        #{custname,jdbcType=VARCHAR},
+      </if>
+      <if test="custUserId != null" >
+        #{custUserId,jdbcType=INTEGER},
+      </if>
+      <if test="custCreateId != null" >
+        #{custCreateId,jdbcType=INTEGER},
+      </if>
+      <if test="custSource != null" >
+        #{custSource,jdbcType=VARCHAR},
+      </if>
+      <if test="custIndustry != null" >
+        #{custIndustry,jdbcType=VARCHAR},
+      </if>
+      <if test="custLevel != null" >
+        #{custLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="custLinkman != null" >
+        #{custLinkman,jdbcType=VARCHAR},
+      </if>
+      <if test="custPhone != null" >
+        #{custPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="custMobile != null" >
+        #{custMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="custZipcode != null" >
+        #{custZipcode,jdbcType=VARCHAR},
+      </if>
+      <if test="custAddress != null" >
+        #{custAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="custCreatetime != null" >
+        #{custCreatetime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.learning.core.pojo.Customer" >
+    update customer
+    <set >
+      <if test="custname != null" >
+        custname = #{custname,jdbcType=VARCHAR},
+      </if>
+      <if test="custUserId != null" >
+        cust_user_id = #{custUserId,jdbcType=INTEGER},
+      </if>
+      <if test="custCreateId != null" >
+        cust_create_id = #{custCreateId,jdbcType=INTEGER},
+      </if>
+      <if test="custSource != null" >
+        cust_source = #{custSource,jdbcType=VARCHAR},
+      </if>
+      <if test="custIndustry != null" >
+        cust_industry = #{custIndustry,jdbcType=VARCHAR},
+      </if>
+      <if test="custLevel != null" >
+        cust_level = #{custLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="custLinkman != null" >
+        cust_linkman = #{custLinkman,jdbcType=VARCHAR},
+      </if>
+      <if test="custPhone != null" >
+        cust_phone = #{custPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="custMobile != null" >
+        cust_mobile = #{custMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="custZipcode != null" >
+        cust_zipcode = #{custZipcode,jdbcType=VARCHAR},
+      </if>
+      <if test="custAddress != null" >
+        cust_address = #{custAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="custCreatetime != null" >
+        cust_createtime = #{custCreatetime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where cust_id = #{custId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.learning.core.pojo.Customer" >
+    update customer
+    set custname = #{custname,jdbcType=VARCHAR},
+      cust_user_id = #{custUserId,jdbcType=INTEGER},
+      cust_create_id = #{custCreateId,jdbcType=INTEGER},
+      cust_source = #{custSource,jdbcType=VARCHAR},
+      cust_industry = #{custIndustry,jdbcType=VARCHAR},
+      cust_level = #{custLevel,jdbcType=VARCHAR},
+      cust_linkman = #{custLinkman,jdbcType=VARCHAR},
+      cust_phone = #{custPhone,jdbcType=VARCHAR},
+      cust_mobile = #{custMobile,jdbcType=VARCHAR},
+      cust_zipcode = #{custZipcode,jdbcType=VARCHAR},
+      cust_address = #{custAddress,jdbcType=VARCHAR},
+      cust_createtime = #{custCreatetime,jdbcType=TIMESTAMP}
+    where cust_id = #{custId,jdbcType=INTEGER}
+  </update>
+</mapper>
